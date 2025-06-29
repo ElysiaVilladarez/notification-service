@@ -1,0 +1,9 @@
+{
+    "detail": {
+        "userId": "test1",
+        "firstName": "Wahoo",
+        "lastName": "Crowley",
+        "birthDate": "1990-01-01",
+        "timezoneLocation": "America/New_York"
+    }
+}
