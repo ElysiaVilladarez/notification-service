@@ -51,4 +51,15 @@ export const functions = {
   sendGreeting: {
     handler: 'src/functions/notification/send-greeting.handler'
   },
+  birthdayChecker: {
+    handler: 'src/functions/birthday-checker.handler',
+    events: [
+      {
+        schedule: {
+          rate: ['cron(0,30 * * * ? *)'],
+          description: 'Check for birthday notifications every 0th and 30th minute'
+        }
+      }
+    ]
+  },
 }; 

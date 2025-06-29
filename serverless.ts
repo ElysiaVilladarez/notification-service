@@ -15,6 +15,7 @@ const serverlessConfiguration: AWS = {
       STAGE: '${self:provider.stage}',
       ENVIRONMENT: '${self:provider.stage}',
       USERS_TABLE_NAME: '${self:service}-users-${self:provider.stage}',
+      USER_BIRTHDAY_TABLE_NAME: '${self:service}-user-birthday-${self:provider.stage}',
       AWS_ACCOUNT_ID: '${self:custom.AWS_ACCOUNT_ID}',
       AWS_REGION: '${self:custom.AWS_REGION}',
       USER_UPDATE_QUEUE_URL: '${self:service}-user-update-queue-${self:provider.stage}',

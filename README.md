@@ -168,6 +168,11 @@ To reduce scope, the currently implemented code has no `sendAnniversary` handlin
 
 Due to the limitation of `serverless offline`, specifically for the offline version of SQS, some processes were removed or skipped.
 
+**Offline Workaround Development:**
+![Birthday Greeting - Offline Workaround](./docs/Birthday%20Greeting%20-%20Offline%20Workaround.png)
+
+I wasn't able to fix the role permission I'm getting for the EventBridge Scheduler Serverless Offline in time. So I've done a workaround that uses polling. A lambda runs every 0th and 30th minute, checking for users with birthdays on the current date.
+
 ### Key Components
 
 - **DynamoDB Table**: Stores user data with stream enabled

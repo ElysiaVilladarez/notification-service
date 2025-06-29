@@ -22,6 +22,33 @@ export const resources = {
         },
       },
     },
+    UserBirthdayTable: {
+      Type: 'AWS::DynamoDB::Table',
+      Properties: {
+        TableName: '${self:service}-user-birthday-${self:provider.stage}',
+        BillingMode: 'PAY_PER_REQUEST',
+        AttributeDefinitions: [
+          {
+            AttributeName: 'birthday',
+            AttributeType: 'S',
+          },
+          {
+            AttributeName: 'userId',
+            AttributeType: 'S',
+          },
+        ],
+        KeySchema: [
+          {
+            AttributeName: 'birthday',
+            KeyType: 'HASH',
+          },
+          {
+            AttributeName: 'userId',
+            KeyType: 'RANGE',
+          },
+        ],
+      },
+    },
     UserUpdateQueue: {
       Type: 'AWS::SQS::Queue',
       Properties: {
@@ -161,6 +188,9 @@ export const resources = {
                   Resource: [
                     {
                       'Fn::GetAtt': ['UsersTable', 'Arn'],
+                    },
+                    {
+                      'Fn::GetAtt': ['UserBirthdayTable', 'Arn'],
                     },
                   ],
                 },

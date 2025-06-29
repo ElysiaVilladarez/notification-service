@@ -13,6 +13,7 @@ export interface IUserModel {
 export class UserModel implements IUserModel {
   private readonly client: DynamoDBDocumentClient;
   private readonly tableName: string;
+  private readonly userBirthdayTableName: string;
 
   constructor() {
     const dynamodbParams: DynamoDBClientConfig = {
@@ -24,6 +25,7 @@ export class UserModel implements IUserModel {
     const dynamoClient = new DynamoDBClient(dynamodbParams);
     this.client = DynamoDBDocumentClient.from(dynamoClient);
     this.tableName = process.env.USERS_TABLE_NAME!;
+    this.userBirthdayTableName = process.env.USER_BIRTHDAY_TABLE_NAME!;
   }
 
   async createUser(userData: CreateUserRequest): Promise<User> {
@@ -40,12 +42,36 @@ export class UserModel implements IUserModel {
       updatedAt: now,
     };
 
+    // Create user in Users table
     await this.client.send(
       new PutCommand({
         TableName: this.tableName,
         Item: user,
       })
     );
+
+    // Compute birthDateUTC and add entry to UserBirthday table
+    const [year, month, day] = userData.birthDate.split('-').map(Number);
+    const birthday = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    const userBirthdayEntry = {
+      birthday,
+      userId,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      timezoneLocation: userData.timezoneLocation,
+      originalBirthDate: userData.birthDate,
+      createdAt: now,
+    };
+
+    await this.client.send(
+      new PutCommand({
+        TableName: this.userBirthdayTableName,
+        Item: userBirthdayEntry,
+      })
+    );
+
+    console.log(`User birthday entry created: ${birthday} for user ${userId}`);
 
     return user;
   }
@@ -72,12 +98,35 @@ export class UserModel implements IUserModel {
   }
 
   async deleteUser(userId: string): Promise<void> {
+    const user = await this.getUser(userId);
+    
+    if (!user) {
+      console.log(`User ${userId} not found, nothing to delete`);
+      return;
+    }
+
+    // Delete from Users table
     await this.client.send(
       new DeleteCommand({
         TableName: this.tableName,
         Key: { userId },
       })
     );
+
+    const [year, month, day] = user.birthDate.split('-').map(Number);
+    const birthday = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    await this.client.send(
+      new DeleteCommand({
+        TableName: this.userBirthdayTableName,
+        Key: {
+          birthday,
+          userId
+        }
+      })
+    );
+
+    console.log(`User ${userId} deleted from both Users and UserBirthday tables`);
   }
 }
 

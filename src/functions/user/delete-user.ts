@@ -28,7 +28,6 @@ export const handler = async (
     
     const userModel = UserModelFactory.create();
     
-    // Check if user exists before deleting
     const existingUser = await userModel.getUser(userId);
     
     if (!existingUser) {

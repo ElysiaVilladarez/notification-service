@@ -114,32 +114,32 @@ async function createSchedulerSchedule(notificationType: string, schedule: TBirt
   const scheduleName = `${notificationType}-${schedule.userId}`;
   
   // If stage is dev, invoke lambda directly instead of creating scheduler
-  if (process.env.STAGE === 'dev') {
-    console.log('Dev stage detected, invoking lambda directly instead of creating scheduler');
+  // if (process.env.STAGE === 'dev') {
+  //   console.log('Dev stage detected, invoking lambda directly instead of creating scheduler');
     
-    const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION, endpoint: 'http://localhost:3002' });
+  //   const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION, endpoint: 'http://localhost:3002' });
     
-    const lambdaParams = {
-      FunctionName: `${process.env.SERVICE_NAME}-${process.env.STAGE}-sendGreeting`,
-      InvocationType: 'Event' as const,
-      Payload: JSON.stringify({
-        detail: {
-          userId: schedule.userId,
-          firstName: schedule.firstName,
-          lastName: schedule.lastName,
-          birthDate: schedule.birthDate,
-          timezoneLocation: schedule.timezoneLocation,
-          notificationType: notificationType,
-        }
-      }),
-    };
+  //   const lambdaParams = {
+  //     FunctionName: `${process.env.SERVICE_NAME}-${process.env.STAGE}-sendGreeting`,
+  //     InvocationType: 'Event' as const, // Asynchronous invocation
+  //     Payload: JSON.stringify({
+  //       detail: {
+  //         userId: schedule.userId,
+  //         firstName: schedule.firstName,
+  //         lastName: schedule.lastName,
+  //         birthDate: schedule.birthDate,
+  //         timezoneLocation: schedule.timezoneLocation,
+  //         notificationType: notificationType,
+  //       }
+  //     }),
+  //   };
     
-    console.log('Invoking lambda directly:', lambdaParams);
-    await lambdaClient.send(new InvokeCommand(lambdaParams));
-    console.log(`Lambda invoked directly for user ${schedule.userId}`);
+  //   console.log('Invoking lambda directly:', lambdaParams);
+  //   await lambdaClient.send(new InvokeCommand(lambdaParams));
+  //   console.log(`Lambda invoked directly for user ${schedule.userId}`);
     
-    return scheduleName;
-  }
+  //   return scheduleName;
+  // }
   
   // For non-dev stages, create EventBridge Scheduler schedule
   const schedulerClient = new SchedulerClient();
